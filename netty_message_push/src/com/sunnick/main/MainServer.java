@@ -1,5 +1,6 @@
 package com.sunnick.main;
 
+import com.sunnick.entity.NettyConstant;
 import com.sunnick.server.NettyServer;
 
 /**
@@ -10,6 +11,6 @@ import com.sunnick.server.NettyServer;
  */
 public class MainServer {
 	public static void main(String[] args) throws InterruptedException {
-		new NettyServer().bind();
+		new NettyServer(NettyConstant.PORT).bind();
 	}
 }

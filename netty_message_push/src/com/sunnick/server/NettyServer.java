@@ -22,6 +22,12 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
  *
  */
 public class NettyServer {
+	
+	private static int port;
+	
+	public NettyServer(int port) {
+		this.port = port;
+	}
 
 	public void bind() throws InterruptedException {
 			EventLoopGroup boss = new NioEventLoopGroup();
@@ -31,15 +37,18 @@ public class NettyServer {
 					.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new ChannelInitializer<SocketChannel>() {
 						@Override
 						protected void initChannel(SocketChannel channel) throws Exception {
-							channel.pipeline().addLast("NettyMessageDecoder",new NettyMessageDecoder(1024 * 1024, 0, 4));
+							channel.pipeline().addLast("NettyMessageDecoder",
+									new NettyMessageDecoder(NettyConstant.MAX_FRAME_LENGTH,
+											NettyConstant.LENGTH_FIELD_OFFSET,
+											NettyConstant.LENGTH_FIELD_LENGTH));
 							channel.pipeline().addLast("NettyMessageEncoder", new NettyMessageEncoder());
-//							channel.pipeline().addLast("ReadTimeoutHandler", new ReadTimeoutHandler(50));
+							channel.pipeline().addLast("ReadTimeoutHandler", new ReadTimeoutHandler(NettyConstant.TIMEOUT_SECONDS));
 							channel.pipeline().addLast("LoginAuthRespHandler", new LoginAuthRespHandler());
 							channel.pipeline().addLast("HeartBeatRespHandler", new HeartBeatRespHandler());
 						}
 					});
 
-			b.bind(NettyConstant.REMOTEIP, NettyConstant.PORT).sync();
+			b.bind(port).sync();
 			System.out.println("netty server start ok:" + NettyConstant.REMOTEIP + " - " + NettyConstant.PORT);
 	}
 

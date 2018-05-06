@@ -11,6 +11,6 @@ import com.sunnick.entity.NettyConstant;
  */
 public class MainClient {
 	public static void main(String[] args) throws InterruptedException {
-		new NettyClient().connect(NettyConstant.PORT,NettyConstant.REMOTEIP);
+		new NettyClient(NettyConstant.REMOTEIP,NettyConstant.PORT).connect();
 	}
 }

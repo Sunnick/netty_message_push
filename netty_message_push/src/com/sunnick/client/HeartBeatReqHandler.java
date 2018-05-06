@@ -3,6 +3,7 @@ package com.sunnick.client;
 import java.util.concurrent.TimeUnit;
 
 import com.sunnick.entity.Header;
+import com.sunnick.entity.NettyConstant;
 import com.sunnick.entity.NettyMessage;
 import com.sunnick.entity.NettyMessageType;
 
@@ -25,7 +26,7 @@ public class HeartBeatReqHandler extends ChannelHandlerAdapter{
 		NettyMessage message = (NettyMessage) msg;
 		//握手成功，主动发起心跳
 		if(message.getHeader() != null && message.getHeader().getType() == NettyMessageType.LOGIN_RESP.value()){
-			heartBeat = ctx.executor().scheduleAtFixedRate(new HeartBeatTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
+			heartBeat = ctx.executor().scheduleAtFixedRate(new HeartBeatTask(ctx), 0, NettyConstant.HEART_BEAT_MILLISECONDS, TimeUnit.MILLISECONDS);
 		}
 		//收到心跳包
 		else if(message.getHeader() != null && message.getHeader().getType() == NettyMessageType.HEARTBEAT_RESP.value()){
@@ -45,7 +46,6 @@ public class HeartBeatReqHandler extends ChannelHandlerAdapter{
 	}
 	
 	
-	public static String str = "我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人我是中国人";
 	
 	/**
 	 * 构建心跳包
@@ -55,7 +55,6 @@ public class HeartBeatReqHandler extends ChannelHandlerAdapter{
 		Header header = new Header();
 		header.setType(NettyMessageType.HEARTBEAT_REQ.value());
 		msg.setHeader(header);
-		msg.setBody(str);
 		return msg;
 	}
 	

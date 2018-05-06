@@ -30,13 +30,26 @@ public class NettyClient {
 	
 	private EventLoopGroup group = new NioEventLoopGroup();
 	
+	private String host;
+	private int port;
+	
+	/**
+	 * @param host IP地址
+	 * @param port 端口号
+	 */
+	public NettyClient(String host,int port) {
+		this.host = host;
+		this.port = port;
+	}
+	
+	
 	/**
 	 * 建立连接
 	 * @param port
 	 * @param host
 	 * @throws InterruptedException 
 	 */
-	public void connect(final int port,final String host) throws InterruptedException{
+	public void connect() throws InterruptedException{
 		try{
 			//初始化客户端
 			Bootstrap b = new Bootstrap();
@@ -45,9 +58,10 @@ public class NettyClient {
 				.handler(new ChannelInitializer<SocketChannel>(){
 					@Override
 					protected void initChannel(SocketChannel channel) throws Exception {
-						channel.pipeline().addLast("MessageDecoder",new NettyMessageDecoder(1024*1024,0,4));
+						channel.pipeline().addLast("MessageDecoder",new NettyMessageDecoder(
+								NettyConstant.MAX_FRAME_LENGTH,NettyConstant.LENGTH_FIELD_OFFSET,NettyConstant.LENGTH_FIELD_LENGTH));
 						channel.pipeline().addLast("MessageEncoder",new NettyMessageEncoder());
-//						channel.pipeline().addLast("ReadTimeoutHandler",new ReadTimeoutHandler(50));
+						channel.pipeline().addLast("ReadTimeoutHandler",new ReadTimeoutHandler(NettyConstant.TIMEOUT_SECONDS));
 						channel.pipeline().addLast("LoginAuthReqHandler",new LoginAuthReqHandler());
 						channel.pipeline().addLast("HeartBeatReqHandler",new HeartBeatReqHandler());
 					}
@@ -63,7 +77,7 @@ public class NettyClient {
 				public void run() {
 					try {
 						TimeUnit.SECONDS.sleep(5);
-						connect(port,host);
+						connect();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
